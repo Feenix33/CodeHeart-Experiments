@@ -12,11 +12,13 @@ var START_TIME = currentTime();
 
 // TODO: DECLARE your variables here
 var lastKeyCode;
+var boxWidth = screenWidth/10;
 var ballX = screenWidth/2;
 var ballY = screenHeight/2;
 var ballRadius = 15;
 var ballVelX = 3;
-var ballVelY = 4;
+var ballVelY = 5;
+var ballColor = makeColor(0.25, 0, 0.85);
 
 ///////////////////////////////////////////////////////////////
 //                                                           //
@@ -42,14 +44,12 @@ function onTick() {
     clearRectangle(0, 0, screenWidth, screenHeight);
 
     // draw some boxes
-    var boxWidth = screenWidth/10;
     var j;
     for (var x=0,j=0; x < screenWidth; j++, x+=boxWidth) {
       fillRectangle(x, screenHeight/4, boxWidth, screenHeight/2, makeColor((1*j)/10, 0.5, 0.25));
     }
 
     // Draw a bouncing ball
-    var ballColor = makeColor(0.25, 0, 0.85);
     fillCircle(ballX, ballY, ballRadius, ballColor);
     //move the ballVel
     ballX = ballX + ballVelX;
