@@ -33,7 +33,7 @@ function Map(width, height, defaultNodeType, borderType) {
     this.width  = width;
     this.height = height;
 
-    console.log("Map dim = " + width + ", " + height);
+    //console.log("Map dim = " + width + ", " + height);
     this.grid   = [];
 
     for (y = 0; y < height; ++y) {
@@ -79,6 +79,14 @@ Map.prototype.draw = function() {
     }
 }
 
+
+/** return true if the spot is not infinity **/
+Map.prototype.safe = function(x, y) {
+  if (this.get(x,y).moveCost != Infinity) {
+    return true;
+  }
+  return false;
+}
 
 /** Returns the Node at (x, y) */
 Map.prototype.get = function(x, y) {
