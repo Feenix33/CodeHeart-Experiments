@@ -5,10 +5,12 @@ include("PriorityQueue.js");
    of moving onto or off of it. Set to Infinity to prevent movement
    through the node.
  */
-function NodeType(name, imageURL, moveCost) {
+//function NodeType(name, imageURL, moveCost) {
+function NodeType(name, color, moveCost) {
     this.name     = name;
-    this.image    = loadImage(imageURL);
+    //this.image    = loadImage(imageURL);
     this.moveCost = moveCost;
+    this.color = color;
 }
 
 
@@ -31,6 +33,7 @@ function Map(width, height, defaultNodeType, borderType) {
     this.width  = width;
     this.height = height;
 
+    console.log("Map dim = " + width + ", " + height);
     this.grid   = [];
 
     for (y = 0; y < height; ++y) {
@@ -61,12 +64,16 @@ Map.prototype.inBounds = function(x, y) {
 
 
 Map.prototype.draw = function() {
-    var x, y, i, image;
+    var x, y, i, color; //image;
+    var colorBorder = makeColor(0, 0, 0);
 
     i = 0;
     for (y = 0; y < this.height; ++y) {
         for (x = 0; x < this.width; ++x) {
-            drawImage(this.grid[i].type.image, x * TILE_SIZE, y * TILE_SIZE - 40);
+            //drawImage(this.grid[i].type.image, x * TILE_SIZE, y * TILE_SIZE - 40);
+            //drawImage(this.grid[i].type.image, x * TILE_SIZE, y * TILE_SIZE - 40);
+            fillRectangle(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, this.grid[i].type.color);
+            strokeRectangle(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE, colorBorder, 2);
             ++i;
         }
     }
