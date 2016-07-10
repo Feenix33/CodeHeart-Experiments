@@ -10,9 +10,10 @@ var COLOR_TREES = makeColor( 4/255, 100/255,  4/255);
 var COUNT_MOUNTAIN = 8;
 var MOUNTAIN_WIDTH = screenWidth/4;
 var MOUNTAIN_HEIGHT_OFFSET = 500;
-var COUNT_TREES = 18;
-var TREE_WIDTH = 100;
-var TREE_HEIGHT_OFFSET = 300;
+var COUNT_TREES = 28;
+var TREE_WIDTH_MIN =  50;
+var TREE_WIDTH_MAX =  80;
+var TREE_HEIGHT_OFFSET = 400;
 
 ///////////////////////////////////////////////////////////////
 //                                                           //
@@ -58,47 +59,53 @@ function onTick() {
 //                      HELPER RULES                         //
 
 function World() {
-  this.ptsMountain = [];
-  this.trees = [];
+  this.trees = {tops:[], color:[]}
+  this.mountains = {peak:[], color:[]}
 
-  var bandHorz;
   var aPeak = []
-  bandHorz = screenWidth / COUNT_MOUNTAIN;
+  var mtColor;
   bandVert = screenWidth/3;
+
+  peakBand = screenWidth/100;
   for (var j=0; j < COUNT_MOUNTAIN; j++) {
     aPeak = [];
 
-    aPeak = aPeak.concat(randomInteger(bandHorz*j, bandHorz*(j+1)),
+    aPeak = aPeak.concat(randomInteger(0, peakBand) * 100,
                          randomInteger(bandVert - MOUNTAIN_HEIGHT_OFFSET, bandVert + MOUNTAIN_HEIGHT_OFFSET));
-    //aPeak = aPeak.concat(randomInteger (j*bandHorz - bandHorz/2, j*bandHorz + bandHorz/2),
-    //            screenHeight/2);
     aPeak = aPeak.concat(aPeak[0]+MOUNTAIN_WIDTH, screenHeight);
     aPeak = aPeak.concat(aPeak[0]-MOUNTAIN_WIDTH, screenHeight);
-    this.ptsMountain.push(aPeak);
+    this.mountains.peak.push(aPeak);
+    mtColor = randomInteger(64, 167)/255;
+    this.mountains.color.push(makeColor(mtColor, mtColor, mtColor));
   }
 
 
   var atree = [];
-  bandHorz = screenWidth / COUNT_TREES;
+  var treeRange = screenWidth / 20;
+  var treeWidth;
   for (var j=0; j < COUNT_TREES; j++) {
     atree = [];
-    //atree = atree.concat(randomInteger (2*TREE_WIDTH, screenWidth-2*TREE_WIDTH),
-    atree = atree.concat(randomInteger (j*bandHorz - bandHorz/2, j*bandHorz + bandHorz/2),
+  treeWidth = randomInteger (TREE_WIDTH_MIN, TREE_WIDTH_MAX);
+    atree = atree.concat(randomInteger (0, treeRange)*20,
                         randomInteger(3*screenHeight/4, 3*screenHeight/4+TREE_HEIGHT_OFFSET));
-    atree = atree.concat(atree[0]+TREE_WIDTH, screenHeight);
-    atree = atree.concat(atree[0]-TREE_WIDTH, screenHeight);
-    this.trees.push(atree);
+    atree = atree.concat(atree[0]+treeWidth, screenHeight);
+    atree = atree.concat(atree[0]-treeWidth, screenHeight);
+    this.trees.tops.push(atree);
+    greenShade = randomInteger( 64,255);
+    brightness = randomInteger(0, greenShade/2)/255;
+    greenShade = greenShade/255;
+    this.trees.color.push(makeColor(brightness, greenShade, brightness));
   }
 }
 World.prototype.draw = function() {
   var j;
   fillRectangle(0, 0, screenWidth, screenHeight, COLOR_SKY);
 
-  for (j=0; j < this.ptsMountain.length; j++) {
-    fillPolygon(this.ptsMountain[j], COLOR_MOUNTAIN);
+  for (j=0; j < this.mountains.peak.length; j++) {
+    fillPolygon(this.mountains.peak[j], this.mountains.color[j]);
   }
-  for (j=0; j < this.trees.length; j++) {
-    fillPolygon(this.trees[j], COLOR_TREES);
+  for (j=0; j < this.trees.tops.length; j++) {
+    fillPolygon(this.trees.tops[j], this.trees.color[j]);
   }
 }
 
