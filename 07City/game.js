@@ -17,13 +17,15 @@ var theWorld = [
     [1, 1, 2, 0, 3, 1]
   ];
 *****/
+var colorTile = [BLUE, LAWNGREEN, LIGHTGREY, DARKGREY, GREY, LIGHTGREY, GREY, LIGHTGREY, DARKGREY, GREY, WHITESMOKE];
 var theWorld = [];
-var sizeWorld = 20;
-var maxHeightWorld = 10;
-var colorTile = [LIME, LIGHTGREY, ORANGE, YELLOW, DARKGREY, BLUE, VIOLET, GREY, WHITE, GOLD, SILVER];
+var sizeWorld = 40;
+var maxHeightWorld = colorTile.length;
 var Origin = {x:900, y:200}
-var tileWidth = 40;
+var tileWidth = 20;
 var tileHeight = tileWidth / 2;//20;
+var percentBuildings = 0.50;
+var strokeWidth = 2;
 
 ///////////////////////////////////////////////////////////////
 //                                                           //
@@ -38,6 +40,41 @@ function onKeyStart(key) {
 }
 
 function createWorld() {
+  var x, y, j, k;
+  var waterLine = randomInteger(0, sizeWorld-1);
+  var line = [];
+  var r, countBuilt, maxTimes;
+  var countLand = 0;
+
+  for (x = 0; x < sizeWorld; x++) {
+    r = Math.random();
+    if (r > 0.66667 && waterLine < sizeWorld) waterLine++;
+    else if (r < 0.3333 && waterLine > 0) waterLine--;
+    line = [];
+    for (y = 0; y < sizeWorld; y++) {
+      if (y < waterLine) {
+        line.push(1);
+        countLand++;
+      }
+      else line.push(0);
+    }
+    theWorld.push(line);
+  }
+
+  //for (j = 0; j < 2*sizeWorld; j++) { }
+  countBuilt = Math.round(countLand * percentBuildings);
+  while (countBuilt > 0) {
+    x = randomInteger(0, sizeWorld-1);
+    y = randomInteger(0, sizeWorld-1);
+    if (theWorld[y][x] != 0) {
+      k = randomInteger(2, maxHeightWorld-1);
+      theWorld[y][x] = k;
+      countBuilt--;
+    }
+  }
+}
+
+function createWorldB() {
   var x, y, j, k;
   var line = [];
 
@@ -117,7 +154,6 @@ function placeTile(x, y) {
   }
   /***
   ***/
-  var strokeWidth = 3;
   fillPolygon(ptsLeft, colorTile[theWorld[y][x]]);
   fillPolygon(ptsRight, colorTile[theWorld[y][x]]);
   //fillPolygon(ptsTop, colorTile[theWorld[y][x]]);
