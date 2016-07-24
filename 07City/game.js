@@ -16,7 +16,9 @@ var Origin = {x:900, y:200}
 var tileWidth = 20;
 var tileHeight = tileWidth / 2;//20;
 var percentBuildings = 0.50;
+var probPark = 0.10;
 var strokeWidth = 2;
+var countLand = 0;
 
 ///////////////////////////////////////////////////////////////
 //                                                           //

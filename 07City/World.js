@@ -6,25 +6,34 @@ function makeTerrainType(name, color) {
     base : [],
     left : [],
     right : [],
-    height : 0
   };
 }
 
 var WATER = makeTerrainType("water", BLUE);
 var GRASS = makeTerrainType("grass", GREEN);
 var ROAD = makeTerrainType("road", BLACK);
-var BUILDING0 = makeTerrainType("building0", GREY);
-var BUILDING1 = makeTerrainType("building1", LIGHTGREY);
-var BUILDING2 = makeTerrainType("building2", DARKGREY);
+var BUILDING = makeTerrainType("building", GREY);
 var ERROR = makeTerrainType("error", RED);
+var BUILDINGA = makeTerrainType("buildingA", LIGHTGREY);
+var BUILDINGB = makeTerrainType("buildingB", DARKGREY);
+var BUILDINGC = makeTerrainType("buildingC", GREY25);
+var BUILDINGE = makeTerrainType("buildingE", GREY50);
+var BUILDINGD = makeTerrainType("buildingD", GREY75);
+
+function WorldTile(tile) {
+  return {
+    typeTile : tile,
+    height : 0
+  }
+}
 
 function createWorld() {
   var x, y, j, k;
   var waterLine = randomInteger(Math.floor(sizeWorld/2), sizeWorld-1);
   var line = [];
   var r, countBuilt, maxTimes;
-  var countLand = 0;
 
+  countLand = 0;
   for (x = 0; x < sizeWorld; x++) {
     r = Math.random();
     if (r > 0.66667 && waterLine < sizeWorld) waterLine++;
@@ -32,30 +41,85 @@ function createWorld() {
     line = [];
     for (y = 0; y < sizeWorld; y++) {
       if (y < waterLine) {
-        line.push(GRASS);
+        line.push(WorldTile(GRASS));
         countLand++;
       }
-      else line.push(WATER);
+      else line.push(WorldTile(WATER));
     }
     theWorld.push(line);
   }
 
-  //for (j = 0; j < 2*sizeWorld; j++) { }
-  countBuilt = Math.round(countLand * percentBuildings);
-  while (countBuilt > 0) {
-    x = randomInteger(0, sizeWorld-1);
-    y = randomInteger(0, sizeWorld-1);
-    if (theWorld[y][x] == GRASS) {
-      switch (randomInteger(0, 2)) {
-        case 0: theWorld[y][x] = BUILDING0; break;
-        case 1: theWorld[y][x] = BUILDING1; break;
-        default: theWorld[y][x] = BUILDING2; break;
+  growCity();
+}
+
+function growCity() {
+  var x, y;
+  var gridSize = 3;
+  var buildings = [BUILDINGA, BUILDINGB, BUILDINGC, BUILDINGD, BUILDINGE]
+  var nBuilding = buildings.length - 1;
+
+  // make roads one direction
+  for (x = 0; x < sizeWorld; x+=gridSize) {
+    for (y = 0; y < sizeWorld; y+=1) {
+      if (theWorld[y][x].typeTile == GRASS) {
+        theWorld[y][x].typeTile = ROAD;
       }
-      countBuilt--;
+    }
+  }
+  // make roads other direction
+  for (x = 0; x < sizeWorld; x+=1) {
+    for (y = 0; y < sizeWorld; y+=gridSize) {
+      if (theWorld[y][x].typeTile == GRASS) {
+        theWorld[y][x].typeTile = ROAD;
+      }
+    }
+  }
+  // grow some buildings
+  // compute upper limit of building, higher near center
+  var radiusWorld = theWorld.length / 2;
+  var radiusBuilding;
+
+  for (x = 0; x < sizeWorld; x+=1) {
+    for (y = 0; y < sizeWorld; y+=1) {
+      if (theWorld[y][x].typeTile == GRASS) {
+        if(randomReal(0, 1) > probPark) {
+          theWorld[y][x].typeTile = buildings[randomInteger(0,nBuilding)];//BUILDING;
+          radiusBuilding = radiusWorld  - (Math.abs(y - radiusWorld) + Math.abs(x - radiusWorld)) * 0.7;
+          if (radiusBuilding < 2) {radiusBuilding = 2;}
+            theWorld[y][x].height = randomInteger(2, radiusBuilding);
+        }
+      }
+    }
+  }
+  // Clean up roads against the water
+  for (y = 0; y < sizeWorld; y+=1) {
+    for (x = 1; x < sizeWorld; x+=1) {
+      if ((theWorld[y][x].typeTile == WATER) && (theWorld[y][x-1].typeTile == ROAD)) {
+        theWorld[y][x-1].typeTile = GRASS;
+      }
+    }
+  }
+  for (y = 0; y < sizeWorld; y+=1) {
+    if (theWorld[y][sizeWorld-1].typeTile == ROAD) {
+      theWorld[y][sizeWorld-1].typeTile = WATER;
     }
   }
 }
 
+function growCityOld() {
+  var x, y;
+  var countBuilt = Math.round(countLand * percentBuildings);
+
+  while (countBuilt > 0) {
+    x = randomInteger(0, sizeWorld-1);
+    y = randomInteger(0, sizeWorld-1);
+    if (theWorld[y][x].typeTile == GRASS) {
+      theWorld[y][x].typeTile = BUILDING;
+        theWorld[y][x].height = randomInteger(2, 12);
+      countBuilt--;
+    }
+  }
+}
 
 function placeTile(x, y) {
   var xpos, ypos;
@@ -81,6 +145,8 @@ function placeTile(x, y) {
   }
 
   // Create the top
+  ht = theWorld[y][x].height * tileHeight;
+  /***
   switch (theWorld[y][x]) {
     case WATER: ht = 0; break;
     case GRASS: ht = 1; break;
@@ -90,6 +156,7 @@ function placeTile(x, y) {
     default: ht = 9; break;
   }
   ht *= tileHeight;
+  ***/
   for (j=0; j < ptsTop.length; j+=2) {
     xo = ptsTop[j];
     yo = ptsTop[j+1] - ht;
@@ -108,9 +175,9 @@ function placeTile(x, y) {
     ptsTop[j] += Origin.x;   ptsTop[j+1] += Origin.y;
     ptsBot[j] += Origin.x;   ptsBot[j+1] += Origin.y;
   }
-  fillPolygon(ptsLeft, theWorld[y][x].colorTile);
-  fillPolygon(ptsRight, theWorld[y][x].colorTile);
-  fillPolygon(ptsBot, theWorld[y][x].colorTile);
+  fillPolygon(ptsLeft, theWorld[y][x].typeTile.colorTile);
+  fillPolygon(ptsRight, theWorld[y][x].typeTile.colorTile);
+  fillPolygon(ptsBot, theWorld[y][x].typeTile.colorTile);
 
   strokePolygon(ptsLeft, BLACK, strokeWidth, true);
   strokePolygon(ptsRight, BLACK, strokeWidth, true);

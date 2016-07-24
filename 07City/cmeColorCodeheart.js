@@ -148,3 +148,6 @@ var SLATEGREY = makeColor(112/255, 128/255, 144/255);
 var DARKSLATEGRAY = makeColor(47/255, 79/255, 79/255);
 var DARKSLATEGREY = makeColor(47/255, 79/255, 79/255);
 var BLACK = makeColor(0/255, 0/255, 0/255);
+var GREY25 = makeColor( 64/255,  64/255,  64/255);
+var GREY50 = makeColor(128/255, 128/255, 128/255);
+var GREY75 = makeColor(192/255, 192/255, 192/255);
