@@ -7,3 +7,4 @@ Experiments with codeheart.js and learning the api.
 * 04Trains - Mimic of the twitter trainspotting bot
 * 05Map - Simple map and animation using path finding; errors out on some random generation
 * 06Snow - Random drawing of trees, mountains and falling snow
+* 07City - Random city against water; building heights randomized
